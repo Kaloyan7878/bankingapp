@@ -9,5 +9,24 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
+    private final AccountService accountService;
 
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
+    public ResponseEntity<String> deposit(@PathVariable String accountNumber, @RequestBody TransactionRequest request) {
+        accountService.deposit(accountNumber, request.amount());
+        return ResponseEntity.ok("Deposit successful");
+    }
+
+    public ResponseEntity<String> withdraw(@PathVariable String accountNumber, @RequestBody TransactionRequest request) {
+        accountService.withdraw(accountNumber, request.amount());
+        return ResponseEntity.ok("Withdraw successful");
+    }
+
+    public ResponseEntity<String> transfer(@RequestBody TransferRequest request) {
+        accountService.transfer(request.fromAccountNumber(), request.toAccountNumber(), request.amount());
+        return ResponseEntity.ok("Transfer successful");
+    }
 }
