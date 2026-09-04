@@ -49,8 +49,8 @@ A Spring Boot REST API for managing bank accounts, handling financial transactio
 4. The application will start on the default port **8080**.
    Base URL: `http://localhost:8080`
 
-Swagger UI for testing URL: `http://localhost:8080/swagger-ui/index.html`
-H2 console to see the loaded data URL: `http://localhost:8080/h2-console`
+* Swagger UI for testing URL: `http://localhost:8080/swagger-ui/index.html`
+* H2 console to see the loaded data URL: `http://localhost:8080/h2-console`
 
 ---
 
