@@ -6,7 +6,7 @@ A Spring Boot REST API for managing bank accounts, handling financial transactio
  
 * **Java** 25
 * **Spring Boot** (4.1.1)
-* * **Maven** (Build & Dependency Management)
+* **Maven** (Build & Dependency Management)
 * **Spring Data JPA** & **H2 Database** (In-Memory)
 * **Spring WebMVC**
 * **Project Lombok**
