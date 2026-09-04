@@ -40,7 +40,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    void deposit_increasesBalance() {
+    void depositIncreasesBalance() {
         when(accountRepository.findByAccountNumber("BG22222")).thenReturn(Optional.of(account));
 
         accountService.deposit("BG22222", new BigDecimal("50.00"));
@@ -51,20 +51,20 @@ public class AccountServiceTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"0", "-1", "-100.50"})
-    void deposit_invalidAmount_throws(String amount) {
+    void depositInvalidAmountThrows(String amount) {
         assertThrows(RuntimeException.class,
                 () -> accountService.deposit("BG22222", new BigDecimal(amount)));
         verifyNoInteractions(accountRepository);
     }
 
     @Test
-    void deposit_nullAmount_throws() {
+    void depositNullAmountThrows() {
         assertThrows(RuntimeException.class, () -> accountService.deposit("BG22222", null));
         verifyNoInteractions(accountRepository);
     }
 
     @Test
-    void deposit_accountNotFound_throws() {
+    void depositAccountNotFoundThrows() {
         when(accountRepository.findByAccountNumber("MISSING")).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
@@ -72,6 +72,5 @@ public class AccountServiceTest {
         verify(accountRepository, never()).save(any());
     }
 
-
-
+    @Test
 }
