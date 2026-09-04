@@ -32,6 +32,13 @@ public class AccountServiceTest {
 
     private Account account;
 
+    private Account newAccount(String number, String balance) {
+        Account a = new Account();
+        a.setAccountNumber(number);
+        a.setBalance(new BigDecimal(balance));
+        return a;
+    }
+
     @BeforeEach
     void setUp() {
         account = new Account();
@@ -73,4 +80,67 @@ public class AccountServiceTest {
     }
 
     @Test
+    void withdrawSufficientFundsDecreasesBalance() {
+        when(accountRepository.findByAccountNumber("BG22222")).thenReturn(Optional.of(account));
+
+        accountService.withdraw("BG22222", new BigDecimal("40.00"));
+
+        assertThat(account.getBalance()).isEqualByComparingTo("60.00");
+        verify(accountRepository).save(account);
+    }
+
+    @Test
+    void withdrawInsufficientFundsThrows() {
+        when(accountRepository.findByAccountNumber("BG22222")).thenReturn(Optional.of(account));
+
+        assertThrows(RuntimeException.class,
+                () -> accountService.withdraw("BG22222", new BigDecimal("200.00")));
+
+        assertThat(account.getBalance()).isEqualByComparingTo("100.00");
+        verify(accountRepository, never()).save(any());
+    }
+
+    @Test
+    void withdrawInvalidAmountThrows() {
+        assertThrows(RuntimeException.class,
+                () -> accountService.withdraw("BG22222", BigDecimal.ZERO));
+        verifyNoInteractions(accountRepository);
+    }
+
+    @Test
+    void withdrawAccountNotFoundThrows() {
+        when(accountRepository.findByAccountNumber("MISSING")).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class,
+                () -> accountService.withdraw("MISSING", new BigDecimal("10")));
+    }
+
+    @Test
+    void transferFundsBetweenAccounts() {
+        Account from = newAccount("BG22222", "100.00");
+        Account to = newAccount("BG11111", "20.00");
+
+        when(accountRepository.findByAccountNumber("BG22222")).thenReturn(Optional.of(from));
+        when(accountRepository.findByAccountNumber("BG11111")).thenReturn(Optional.of(to));
+
+        accountService.transfer("BG22222", "BG11111", new BigDecimal("30.00"));
+
+        assertThat(from.getBalance()).isEqualByComparingTo("70.00");
+        assertThat(to.getBalance()).isEqualByComparingTo("50.00");
+    }
+
+    @Test
+    void transferInsufficientFundsThrows() {
+        Account from = newAccount("BG22222", "10.00");
+        Account to = newAccount("BG11111", "20.00");
+
+        when(accountRepository.findByAccountNumber("BG22222")).thenReturn(Optional.of(from));
+        when(accountRepository.findByAccountNumber("BG11111")).thenReturn(Optional.of(to));
+
+        assertThrows(RuntimeException.class,
+                () -> accountService.transfer("BG22222", "BG11111", new BigDecimal("50.00")));
+
+        assertThat(from.getBalance()).isEqualByComparingTo("10.00");
+        assertThat(to.getBalance()).isEqualByComparingTo("20.00");
+    }
 }
